@@ -1,0 +1,6 @@
+*_compiled_cache
+*_checkpoints
+*.log
+outputs
+unsloth_amd
+unsloth_rocm
