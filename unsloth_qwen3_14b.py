@@ -34,8 +34,8 @@ model = FastLanguageModel.get_peft_model(
 import re
 from datasets import load_dataset, Dataset
 
-reasoning_dataset = load_dataset("/workspace/models/OpenMathReasoning-mini", split = "cot")
-non_reasoning_dataset = load_dataset("/workspace/models/FineTome-100k", split = "train")
+reasoning_dataset = load_dataset("/workspace/unsloth_dev/datasets/OpenMathReasoning-mini", split = "cot")
+non_reasoning_dataset = load_dataset("/workspace/unsloth_dev/datasets/FineTome-100k", split = "train")
 print(f"reasoning_dataset:\n{reasoning_dataset}")
 print(f"non_reasoning_dataset:\n{non_reasoning_dataset}")
 

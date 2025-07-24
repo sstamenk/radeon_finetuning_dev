@@ -1,7 +1,7 @@
 from unsloth import FastLanguageModel
 import torch
 
-model_name = "/workspace/models/gemma-3-4b-it"
+model_name = "/workspace/models/DeepSeek-R1-Distill-Llama-8B"
 max_seq_length = 1024 # Can increase for longer reasoning traces
 lora_rank = 32 # Larger rank = smarter, but slower
 
@@ -61,7 +61,7 @@ def extract_hash_answer(text: str) -> str | None:
 
 # uncomment middle messages for 1-shot prompting
 def get_gsm8k_questions(split = "train") -> Dataset:
-    data = load_dataset('/workspace/models/gsm8k', 'main')[split] # type: ignore
+    data = load_dataset('/workspace/unsloth_dev/datasets/gsm8k', 'main')[split] # type: ignore
     data = data.map(lambda x: { # type: ignore
         'prompt': [
             {'role': 'system', 'content': SYSTEM_PROMPT},

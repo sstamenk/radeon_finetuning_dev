@@ -2,5 +2,7 @@
 *_checkpoints
 *.log
 outputs
-unsloth_amd
-unsloth_rocm
+datasets
+models
+#unsloth_amd
+#unsloth_rocm

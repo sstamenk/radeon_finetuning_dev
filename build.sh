@@ -1,5 +1,25 @@
 #!/bin/bash
 
+# Function to display usage information
+usage() {
+    echo "Usage: $0 [OPTIONS]"
+    echo "Build Unsloth Docker image with optional base image override"
+    echo ""
+    echo "Options:"
+    echo "  -b, --base-docker    Base Docker image (default: $DEFAULT_BASE_DOCKER)"
+    echo "  -g, --gpu-arch       ROCm architecture (default: auto-detected, currently: $DEFAULT_GPU_ARCH)"
+    echo "  -n, --name           Image name (default: $IMAGE_NAME)"
+    echo "  -t, --tag            Image tag (default: $IMAGE_TAG)"
+    # echo "  -v, --verbose       Show GPU detection details"
+    echo "  -h, --help           Show this help message"
+    echo ""
+    echo "Examples:"
+    echo "  $0                                    # Use default base image and ROCm arch"
+    echo "  $0 -b nvidia/cuda:11.8-runtime-ubuntu20.04  # Override base image"
+    echo "  $0 -r gfx1030                        # Override ROCm architecture"
+    echo "  $0 -b rocm/pytorch:latest -g gfx1100 -n myapp -t v1.0  # Override multiple options"
+}
+
 # Function to detect GPU architecture using rocm-smi
 detect_gpu_arch() {
     local arch=""
@@ -34,12 +54,12 @@ detect_gpu_arch() {
 }
 
 # Default values
-DEFAULT_BASE_DOCKER="unsloth-dev:latest"
+DEFAULT_BASE_DOCKER="rocm/vllm:latest"
 DEFAULT_GPU_ARCH=$(detect_gpu_arch)
 IMAGE_NAME="unsloth-dev"
 IMAGE_TAG="latest"
 CONTAINER_NAME="unsloth-dev-container"
-PWD=$(pwd)
+BASE_DIR=$(dirname "$(realpath "$0")")
 
 # Parse command line arguments
 while [[ $# -gt 0 ]]; do
@@ -66,31 +86,16 @@ while [[ $# -gt 0 ]]; do
         #     shift
         #     ;;
         -h|--help)
-            echo "Usage: $0 [OPTIONS]"
-            echo "Build Docker image with optional base image override"
-            echo ""
-            echo "Options:"
-            echo "  -b, --base-docker    Base Docker image (default: $DEFAULT_BASE_DOCKER)"
-            echo "  -g, --gpu-arch      ROCm architecture (default: auto-detected, currently: $DEFAULT_GPU_ARCH)"
-            echo "  -n, --name          Image name (default: $IMAGE_NAME)"
-            echo "  -t, --tag           Image tag (default: $IMAGE_TAG)"
-            # echo "  -v, --verbose       Show GPU detection details"
-            echo "  -h, --help          Show this help message"
-            echo ""
-            echo "Examples:"
-            echo "  $0                                    # Use default base image and ROCm arch"
-            echo "  $0 -b nvidia/cuda:11.8-runtime-ubuntu20.04  # Override base image"
-            echo "  $0 -r gfx1030                        # Override ROCm architecture"
-            echo "  $0 -b rocm/pytorch:latest -g gfx1100 -n myapp -t v1.0  # Override multiple options"
+            usage
             exit 0
             ;;
         *)
             echo "Unknown option: $1"
-            echo "Use -h or --help for usage information"
+            usage
             exit 1
             ;;
-    esac
-done
+        esac
+    done
 
 # Set BASE_DOCKER to default if not provided
 if [ -z "$BASE_DOCKER" ]; then
@@ -163,7 +168,7 @@ docker run -it \
     --security-opt seccomp=unconfined \
     --privileged \
     --shm-size 32G \
-    --volume ${PWD}:/workspace \
+    --volume ${BASE_DIR}/../:/workspace \
     --name as1 \
     unsloth-dev:latest /bin/bash
 
