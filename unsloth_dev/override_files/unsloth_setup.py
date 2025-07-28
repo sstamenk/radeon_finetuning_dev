@@ -222,9 +222,9 @@ class RocmExtraInstallCommand(install):
         # bitsandbytes
         if importlib.util.find_spec("bitsandbytes") is None:
             print("Installing bitsandbytes...")
-            subprocess.check_call(['git', 'clone', '--recurse-submodules', 'https://github.com/ROCm/bitsandbytes'])
+            subprocess.check_call(['git', 'clone', '--recurse-submodules', 'https://github.com/sstamenk/bitsandbytes'])
             os.chdir('bitsandbytes')
-            subprocess.check_call(['git', 'checkout', 'rocm_enabled_multi_backend'])
+            subprocess.check_call(['git', 'checkout', 'rocm7.0_warpsize_fix'])
             subprocess.check_call(['pip', 'install', '-r', 'requirements-dev.txt'])
             subprocess.check_call(['cmake', '-DCOMPUTE_BACKEND=hip', '-S', '.'])  # Add -DBNB_ROCM_ARCH if needed
             subprocess.check_call(['make'])

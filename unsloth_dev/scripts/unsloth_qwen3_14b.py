@@ -1,12 +1,25 @@
 from unsloth import FastLanguageModel
 import torch
+import os
 
-model_name = "/workspace/models/DeepSeek-R1-Distill-Llama-8B"
+models_dir = os.environ.get("MODELS_DIR")
+if models_dir is None:
+    raise EnvironmentError("MODELS_DIR environment variable is not set. Please set it to the directory where your models are stored.")
+
+datasets_dir = os.environ.get("DATASETS_DIR")
+if datasets_dir is None:
+    raise EnvironmentError("DATASETS_DIR environment variable is not set. Please set it to the directory where your datasets are stored.")
+
+model_name = "DeepSeek-R1-Distill-Llama-8B"
+model_path = os.path.join(models_dir, model_name)
+if not os.path.exists(model_path):
+    raise FileNotFoundError(f"Model path {model_path} does not exist. Please ensure the model is downloaded and available.")
+
 max_seq_length = 2048 # Can increase for longer reasoning traces
 lora_rank = 32 # Larger rank = smarter, but slower
 
 model, tokenizer = FastLanguageModel.from_pretrained(
-    model_name = model_name,
+    model_name = model_path,
     max_seq_length = max_seq_length,
     load_in_4bit = False, # False for LoRA 16bit
     # fast_inference = True, # Enable vLLM fast inference
@@ -34,8 +47,8 @@ model = FastLanguageModel.get_peft_model(
 import re
 from datasets import load_dataset, Dataset
 
-reasoning_dataset = load_dataset("/workspace/unsloth_dev/datasets/OpenMathReasoning-mini", split = "cot")
-non_reasoning_dataset = load_dataset("/workspace/unsloth_dev/datasets/FineTome-100k", split = "train")
+reasoning_dataset = load_dataset("/workspace/datasets/OpenMathReasoning-mini", split = "cot")
+non_reasoning_dataset = load_dataset("/workspace/datasets/FineTome-100k", split = "train")
 print(f"reasoning_dataset:\n{reasoning_dataset}")
 print(f"non_reasoning_dataset:\n{non_reasoning_dataset}")
 
@@ -209,8 +222,8 @@ _ = model.generate(
     streamer = TextStreamer(tokenizer, skip_prompt = True),
 )
 
-model.save_pretrained(model_name+"_lora_model")  # Local saving
-tokenizer.save_pretrained(model_name+"_lora_model")
-model.save_pretrained_merged(model_name+"_lora_merged_16bit", tokenizer, save_method = "merged_16bit",)
-model.save_pretrained_gguf(model_name+"_lora_f16", tokenizer, quantization_method = "f16")
-model.save_pretrained_gguf(model_name+"_lora_q4_k_m", tokenizer, quantization_method = "q4_k_m")
+model.save_pretrained(model_path+"_lora_model")  # Local saving
+tokenizer.save_pretrained(model_path+"_lora_model")
+model.save_pretrained_merged(model_path+"_lora_merged_16bit", tokenizer, save_method = "merged_16bit",)
+model.save_pretrained_gguf(model_path+"_lora_f16", tokenizer, quantization_method = "f16")
+model.save_pretrained_gguf(model_path+"_lora_q4_k_m", tokenizer, quantization_method = "q4_k_m")

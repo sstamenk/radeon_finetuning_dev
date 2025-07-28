@@ -2,7 +2,8 @@
 *_checkpoints
 *.log
 outputs
-datasets
+/*/datasets/*/
 models
-#unsloth_amd
-#unsloth_rocm
+*.csv
+#unsloth
+#unsloth_fork

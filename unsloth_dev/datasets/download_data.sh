@@ -23,7 +23,7 @@ for arg in "$@"; do
 done
 
 # Create datasets directory if it doesn't exist
-DATASETS_DIR=$(dirname "$(realpath "$0")")/datasets
+DATASETS_DIR=$(dirname "$(realpath "$0")")
 if [ ! -d "$DATASETS_DIR" ]; then
     mkdir -p "$DATASETS_DIR"
 fi

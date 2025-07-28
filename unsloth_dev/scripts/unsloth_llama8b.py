@@ -1,12 +1,25 @@
 from unsloth import FastLanguageModel
 import torch
+import os
 
-model_name = "/workspace/models/DeepSeek-R1-Distill-Llama-8B"
+models_dir = os.environ.get("MODELS_DIR")
+if models_dir is None:
+    raise EnvironmentError("MODELS_DIR environment variable is not set. Please set it to the directory where your models are stored.")
+
+datasets_dir = os.environ.get("DATASETS_DIR")
+if datasets_dir is None:
+    raise EnvironmentError("DATASETS_DIR environment variable is not set. Please set it to the directory where your datasets are stored.")
+
+model_name = "DeepSeek-R1-Distill-Llama-8B"
+model_path = os.path.join(models_dir, model_name)
+if not os.path.exists(model_path):
+    raise FileNotFoundError(f"Model path {model_path} does not exist. Please ensure the model is downloaded and available.")
+
 max_seq_length = 1024 # Can increase for longer reasoning traces
 lora_rank = 32 # Larger rank = smarter, but slower
 
 model, tokenizer = FastLanguageModel.from_pretrained(
-    model_name = model_name,
+    model_name = model_path,
     max_seq_length = max_seq_length,
     load_in_4bit = False, # False for LoRA 16bit
     # fast_inference = True, # Enable vLLM fast inference
@@ -61,7 +74,8 @@ def extract_hash_answer(text: str) -> str | None:
 
 # uncomment middle messages for 1-shot prompting
 def get_gsm8k_questions(split = "train") -> Dataset:
-    data = load_dataset('/workspace/unsloth_dev/datasets/gsm8k', 'main')[split] # type: ignore
+    gsm8k_path= os.path.join(datasets_dir, "gsm8k")
+    data = load_dataset(gsm8k_path, 'main')[split] # type: ignore
     data = data.map(lambda x: { # type: ignore
         'prompt': [
             {'role': 'system', 'content': SYSTEM_PROMPT},
@@ -187,6 +201,6 @@ output = model.fast_generate(
 )[0].outputs[0].text
 print(f"** After GRPO trining **\n{output}")
 
-model.save_pretrained_merged(model_name+"_GRPO", tokenizer, save_method = "merged_16bit",)
-model.save_pretrained_gguf(model_name+"_GRPO_f16", tokenizer, quantization_method = "f16")
-model.save_pretrained_gguf(model_name+"_GRPO_q4_k_m", tokenizer, quantization_method = "q4_k_m")
+model.save_pretrained_merged(model_path+"_GRPO", tokenizer, save_method = "merged_16bit",)
+model.save_pretrained_gguf(model_path+"_GRPO_f16", tokenizer, quantization_method = "f16")
+model.save_pretrained_gguf(model_path+"_GRPO_q4_k_m", tokenizer, quantization_method = "q4_k_m")
