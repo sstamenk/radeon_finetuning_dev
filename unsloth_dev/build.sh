@@ -83,13 +83,12 @@ DEFAULT_BASE_DOCKER="registry-sc-harbor.amd.com/framework/compute-rocm-dkms-no-n
 DEFAULT_GPU_ARCH=$(detect_gpu_arch)
 IMAGE_NAME="unsloth-dev"
 IMAGE_TAG="latest"
-CONTAINER_NAME="unsloth-dev-container"
+CONTAINER_NAME="unsloth-dev"
 BASE_DIR=$(dirname "$(realpath "$0")")
 DEV_MODE=true
 MODELS_DIR="/home/syrmia/develop/models"
-DATASETS_DIR="/home/syrmia/develop/radeon_finetuning_dev/datasets"
+DATASETS_DIR="$BASE_DIR/datasets"
 
-# TODO: Move datasets to unsloth_dev directory instead of it being global for all libraries
 # TODO: Create a README.md file with instructions on how to use this script and the Docker image
 
 # Parse command line arguments
@@ -149,8 +148,6 @@ fi
 # Clone repositories if in development mode and override the required files
 if [ "$DEV_MODE" = true ]; then
     clone_repos_dev
-    cp "$BASE_DIR/override_files/unsloth_req_rocm.txt" "$BASE_DIR/$UNSLOTH_DIR/requirements/rocm.txt"
-    cp "$BASE_DIR/override_files/unsloth_setup.py" "$BASE_DIR/$UNSLOTH_DIR/setup.py"
 fi
 
 # Check if MODELS_DIR is set and exists
@@ -214,6 +211,7 @@ fi
 
 # Prepare volume mounts for Docker run
 DOCKER_WORKSPACE="/workspace"
+UNSLOTH_DOCKER_DIR="${DOCKER_WORKSPACE}/${UNSLOTH_DIR}"
 VOLUME_MOUNTS="--volume ${MODELS_DIR}:${DOCKER_WORKSPACE}/models \
                --volume ${DATASETS_DIR}:${DOCKER_WORKSPACE}/datasets"
 
@@ -221,11 +219,17 @@ VOLUME_MOUNTS="--volume ${MODELS_DIR}:${DOCKER_WORKSPACE}/models \
 if [ "$DEV_MODE" = true ]; then
     if [ -d "$UNSLOTH_DIR" ]; then
         VOLUME_MOUNTS="$VOLUME_MOUNTS \
-                       --volume ${BASE_DIR}/$UNSLOTH_DIR:$DOCKER_WORKSPACE/$UNSLOTH_DIR"
+                       --volume ${BASE_DIR}/$UNSLOTH_DIR:$UNSLOTH_DOCKER_DIR"
     fi
     if [ -d "scripts" ]; then
         VOLUME_MOUNTS="$VOLUME_MOUNTS \
-                       --volume ${BASE_DIR}/scripts:$DOCKER_WORKSPACE/scripts"
+                       --volume ${BASE_DIR}/scripts:$DOCKER_WORKSPACE/"
+    fi
+    if [ -d "override_files" ]; then
+        VOLUME_MOUNTS="$VOLUME_MOUNTS \
+                       --volume ${BASE_DIR}/override_files/unsloth_setup.py:$UNSLOTH_DOCKER_DIR/setup.py"
+        VOLUME_MOUNTS="$VOLUME_MOUNTS \
+                       --volume ${BASE_DIR}/override_files/unsloth_req_rocm.txt:$UNSLOTH_DOCKER_DIR/requirements/rocm.txt"
     fi
     echo "Development mode: Mounting local files into container"
 fi
@@ -249,7 +253,7 @@ eval "docker run -d \
     --shm-size 32G \
     $VOLUME_MOUNTS \
     --name ${CONTAINER_NAME} \
-    unsloth-dev:latest tail -f /dev/null"
+    $IMAGE_NAME:$IMAGE_TAG tail -f /dev/null"
 
 
 
@@ -260,7 +264,6 @@ if [ "$(docker ps -q -f name=${CONTAINER_NAME})" ]; then
     echo "Attaching to the running container: ${CONTAINER_NAME}"
     
     if [ "$DEV_MODE" = true ]; then
-        UNSLOTH_DOCKER_DIR="${DOCKER_WORKSPACE}/${UNSLOTH_DIR}"
         BUILD_CMD=" \
             pip install -r ${UNSLOTH_DOCKER_DIR}/requirements/rocm.txt; \
             cd ${UNSLOTH_DOCKER_DIR} && python setup.py clean --all; \

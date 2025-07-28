@@ -10,13 +10,18 @@ ARG DEV_MODE=false
 ENV MODELS_DIR=${WORKDIR}/models
 ENV DATASETS_DIR=${WORKDIR}/datasets
 
+# Copy local files
+COPY scripts ${WORKDIR}/tmp/scripts
+COPY override_files ${WORKDIR}/tmp/override_files
+
 # RUN git clone https://github.com/billishyahao/unsloth.git -b billhe/rocm_enable unsloth_fork
 RUN if [ "$DEV_MODE" = "false" ]; then \
         git clone https://github.com/unslothai/unsloth.git -b amd $UNSLOTH_DIR; \
         # git clone https://github.com/billishyahao/unsloth.git -b billhe/rocm_enable unsloth_fork; \
-        cp -r scripts ${WORKDIR}/scripts; \
-        cp override_files/unsloth_setup.py ${UNSLOTH_DIR}/setup.py; \
-        cp override_files/unsloth_req_rocm.txt ${UNSLOTH_DIR}/requirements/rocm.txt; \
+        mv ${WORKDIR}/tmp/scripts/* ${WORKDIR}; \
+        mv ${WORKDIR}/tmp/override_files/unsloth_setup.py ${UNSLOTH_DIR}/setup.py; \
+        mv ${WORKDIR}/tmp/override_files/unsloth_req_rocm.txt ${UNSLOTH_DIR}/requirements/rocm.txt; \
+        rm -rf ${WORKDIR}/tmp; \
         pip install -r ${UNSLOTH_DIR}/requirements/rocm.txt; \
         cd ${UNSLOTH_DIR} && python setup.py clean --all; \
         cd ${UNSLOTH_DIR} && python setup.py bdist_wheel; \
