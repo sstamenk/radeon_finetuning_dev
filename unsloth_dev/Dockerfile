@@ -18,7 +18,7 @@ COPY override_files ${WORKDIR}/tmp/override_files
 RUN if [ "$DEV_MODE" = "false" ]; then \
         git clone https://github.com/unslothai/unsloth.git -b amd $UNSLOTH_DIR; \
         # git clone https://github.com/billishyahao/unsloth.git -b billhe/rocm_enable unsloth_fork; \
-        mv ${WORKDIR}/tmp/scripts/* ${WORKDIR}; \
+        mv ${WORKDIR}/tmp/scripts ${WORKDIR}/scripts; \
         mv ${WORKDIR}/tmp/override_files/unsloth_setup.py ${UNSLOTH_DIR}/setup.py; \
         mv ${WORKDIR}/tmp/override_files/unsloth_req_rocm.txt ${UNSLOTH_DIR}/requirements/rocm.txt; \
         rm -rf ${WORKDIR}/tmp; \

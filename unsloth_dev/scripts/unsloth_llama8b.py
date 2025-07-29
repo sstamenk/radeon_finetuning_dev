@@ -10,7 +10,7 @@ datasets_dir = os.environ.get("DATASETS_DIR")
 if datasets_dir is None:
     raise EnvironmentError("DATASETS_DIR environment variable is not set. Please set it to the directory where your datasets are stored.")
 
-model_name = "DeepSeek-R1-Distill-Llama-8B"
+model_name = "meta-Llama-3.1-8B-Instruct"
 model_path = os.path.join(models_dir, model_name)
 if not os.path.exists(model_path):
     raise FileNotFoundError(f"Model path {model_path} does not exist. Please ensure the model is downloaded and available.")
