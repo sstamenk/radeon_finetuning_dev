@@ -14,6 +14,8 @@ ENV DATASETS_DIR=${WORKDIR}/datasets
 COPY scripts ${WORKDIR}/tmp/scripts
 COPY override_files ${WORKDIR}/tmp/override_files
 
+RUN pip install -U curl libcurl4-openssl-dev
+
 # RUN git clone https://github.com/billishyahao/unsloth.git -b billhe/rocm_enable unsloth_fork
 RUN if [ "$DEV_MODE" = "false" ]; then \
         git clone https://github.com/unslothai/unsloth.git -b amd $UNSLOTH_DIR; \

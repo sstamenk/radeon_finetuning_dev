@@ -22,7 +22,7 @@ model, tokenizer = FastLanguageModel.from_pretrained(
     model_name = model_path,
     max_seq_length = max_seq_length,
     load_in_4bit = False, # False for LoRA 16bit
-    # fast_inference = True, # Enable vLLM fast inference
+    fast_inference = True, # Enable vLLM fast inference
     max_lora_rank = lora_rank,
     gpu_memory_utilization = 0.6, # Reduce if out of memory
 )

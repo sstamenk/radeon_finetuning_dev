@@ -199,25 +199,25 @@ class RocmExtraInstallCommand(install):
                 subprocess.check_call(['FLASH_ATTENTION_TRITON_AMD_ENABLE="TRUE"', 'python', 'setup.py', 'install', ], shell=True)
                 os.chdir('..')
 
-        # Comment out the following if you need xformers installed.
-        # only install xformers in Instinct GPUs
-        if importlib.util.find_spec("xformers") is None:
-            print("Installing xformers...")
-            if rocm_arch in INSTINCT_ARCH:
-                subprocess.check_call(['git', 'clone', 'https://github.com/ROCm/xformers.git'])
-                os.chdir('xformers')
-                subprocess.check_call(['git', 'submodule', 'update', '--init', '--recursive'])
-                os.environ['PYTORCH_ROCM_ARCH'] = rocm_arch
-                subprocess.check_call(['python', 'setup.py', 'install'])
-                os.chdir('..')
-            elif rocm_arch in RADEON_ARCH:
-                # subprocess.check_call(['git', 'clone', 'https://github.com/ROCm/xformers.git', '-b', 'ck-fmha-enable-knob'])
-                subprocess.check_call(['git', 'clone', 'https://github.com/ROCm/xformers.git'])
-                os.chdir('xformers')
-                subprocess.check_call(['git', 'submodule', 'update', '--init', '--recursive'])
-                os.environ['PYTORCH_ROCM_ARCH'] = rocm_arch
-                subprocess.check_call(['XFORMERS_CK_FLASH_ATTN=0', 'python', 'setup.py', 'install', ], shell=True)
-                os.chdir('..')
+        # # Comment out the following if you need xformers installed.
+        # # only install xformers in Instinct GPUs
+        # if importlib.util.find_spec("xformers") is None:
+        #     print("Installing xformers...")
+        #     if rocm_arch in INSTINCT_ARCH:
+        #         subprocess.check_call(['git', 'clone', 'https://github.com/ROCm/xformers.git'])
+        #         os.chdir('xformers')
+        #         subprocess.check_call(['git', 'submodule', 'update', '--init', '--recursive'])
+        #         os.environ['PYTORCH_ROCM_ARCH'] = rocm_arch
+        #         subprocess.check_call(['python', 'setup.py', 'install'])
+        #         os.chdir('..')
+        #     elif rocm_arch in RADEON_ARCH:
+        #         # subprocess.check_call(['git', 'clone', 'https://github.com/ROCm/xformers.git', '-b', 'ck-fmha-enable-knob'])
+        #         subprocess.check_call(['git', 'clone', 'https://github.com/ROCm/xformers.git'])
+        #         os.chdir('xformers')
+        #         subprocess.check_call(['git', 'submodule', 'update', '--init', '--recursive'])
+        #         os.environ['PYTORCH_ROCM_ARCH'] = rocm_arch
+        #         subprocess.check_call(['XFORMERS_CK_FLASH_ATTN=0', 'python', 'setup.py', 'install', ], shell=True)
+        #         os.chdir('..')
 
         # bitsandbytes
         if importlib.util.find_spec("bitsandbytes") is None:

@@ -25,7 +25,7 @@ model, tokenizer = FastLanguageModel.from_pretrained(
     # fast_inference = True, # Enable vLLM fast inference
     # max_lora_rank = lora_rank,
     full_finetuning = False, # We have full finetuning now!
-    # gpu_memory_utilization = 0.6, # Reduce if out of memory
+    gpu_memory_utilization = 0.9, # Reduce if out of memory
 )
 
 model = FastLanguageModel.get_peft_model(
@@ -99,7 +99,7 @@ data.name = "text"
 combined_dataset = Dataset.from_pandas(pd.DataFrame(data))
 combined_dataset = combined_dataset.shuffle(seed = 3407)
 
-max_prompt_length = 256
+max_new_tokens = 1024
 
 prompt_text = "Solve (x + 2)^2 = 0."
 # prompt_text = "Calculate pi."
@@ -120,7 +120,7 @@ text = tokenizer.apply_chat_template(
 from transformers import TextStreamer
 _ = model.generate(
     **tokenizer(text, return_tensors = "pt").to("cuda"),
-    max_new_tokens = 256, # Increase for longer outputs!
+    max_new_tokens = max_new_tokens, # Increase for longer outputs!
     temperature = 0.7, top_p = 0.8, top_k = 20, # For non thinking
     streamer = TextStreamer(tokenizer, skip_prompt = True),
 )
@@ -139,7 +139,7 @@ text = tokenizer.apply_chat_template(
 from transformers import TextStreamer
 _ = model.generate(
     **tokenizer(text, return_tensors = "pt").to("cuda"),
-    max_new_tokens = 1024, # Increase for longer outputs!
+    max_new_tokens = max_new_tokens, # Increase for longer outputs!
     temperature = 0.6, top_p = 0.95, top_k = 20, # For thinking
     streamer = TextStreamer(tokenizer, skip_prompt = True),
 )
@@ -166,6 +166,9 @@ trainer = SFTTrainer(
         report_to = "none", # Use this for WandB etc
     ),
 )
+
+max_memory = round(torch.cuda.mem_get_info()[1] / 1024 / 1024 / 1024, 3)
+start_gpu_memory = round(torch.cuda.max_memory_reserved() / 1024 / 1024 / 1024, 3)
 
 trainer_stats = trainer.train()
 
@@ -198,7 +201,7 @@ text = tokenizer.apply_chat_template(
 from transformers import TextStreamer
 _ = model.generate(
     **tokenizer(text, return_tensors = "pt").to("cuda"),
-    max_new_tokens = 256, # Increase for longer outputs!
+    max_new_tokens = max_new_tokens, # Increase for longer outputs!
     temperature = 0.7, top_p = 0.8, top_k = 20, # For non thinking
     streamer = TextStreamer(tokenizer, skip_prompt = True),
 )
@@ -217,7 +220,7 @@ text = tokenizer.apply_chat_template(
 from transformers import TextStreamer
 _ = model.generate(
     **tokenizer(text, return_tensors = "pt").to("cuda"),
-    max_new_tokens = 1024, # Increase for longer outputs!
+    max_new_tokens = max_new_tokens, # Increase for longer outputs!
     temperature = 0.6, top_p = 0.95, top_k = 20, # For thinking
     streamer = TextStreamer(tokenizer, skip_prompt = True),
 )
