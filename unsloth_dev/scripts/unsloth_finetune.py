@@ -12,8 +12,6 @@ def parse_arguments():
     parser.add_argument(
         "--model-name",
         type=str,
-        default="meta-Llama-3.1-8B-Instruct",
-        help="Name of the model to fine-tune (default: meta-Llama-3.1-8B-Instruct)"
     )
     return parser.parse_args()
 
