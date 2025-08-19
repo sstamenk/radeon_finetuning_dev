@@ -8,6 +8,7 @@ unsloth_dev/
   datasets/
     download_data.sh      # Hugging Face datasets downloader
   override_files/         # Local overrides (setup.py, rocm.txt) mounted in dev mode
+  requirements.txt        # Prerequisite python packages
   scripts/                # Example fine‑tuning / training scripts
   unsloth/                # Cloned upstream repo (branch: amd) in dev mode
 ```
