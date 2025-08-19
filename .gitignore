@@ -5,5 +5,5 @@ outputs
 /*/datasets/*/
 models
 *.csv
-#unsloth
+unsloth
 #unsloth_fork

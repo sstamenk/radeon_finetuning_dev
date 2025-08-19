@@ -1,6 +1,7 @@
 # Common dependencies
 -r common.txt
 
+transformers<4.53.0
 cmake>=3.26,<4
 packaging
 setuptools>=77.0.3,<80.0.0

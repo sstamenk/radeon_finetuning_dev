@@ -78,7 +78,7 @@ UNSLOTH_REPO_URL="https://github.com/unslothai/unsloth.git"
 UNSLOTH_REPO_BRANCH="amd"
 UNSLOTH_DIR="unsloth"
 
-DEFAULT_BASE_DOCKER="registry-sc-harbor.amd.com/framework/compute-rocm-dkms-no-npi-hipclang:16449_ubuntu24.04_py3.12_vllm_rocm-7.0_97c32fc_pytorch_release-2.7_35daec93"
+DEFAULT_BASE_DOCKER="registry-sc-harbor.amd.com/framework/compute-rocm-dkms-no-npi-hipclang:16518_ubuntu24.04_py3.12_vllm_rocm-7.0_5485f8c_pytorch_release-2.8_419fb697"
 # DEFAULT_BASE_DOCKER="rocm/vllm:latest"
 DEFAULT_GPU_ARCH=$(detect_gpu_arch)
 IMAGE_NAME="unsloth-dev"
@@ -269,6 +269,7 @@ if [ "$(docker ps -q -f name=${CONTAINER_NAME})" ]; then
         BUILD_CMD=" \
             pip install -r ${UNSLOTH_DOCKER_DIR_PATH}/requirements/rocm.txt; \
             cd ${UNSLOTH_DOCKER_DIR_PATH} && python setup.py clean --all; \
+            rm -f ${UNSLOTH_DOCKER_DIR_PATH}/dist/*.whl; \
             cd ${UNSLOTH_DOCKER_DIR_PATH} && python setup.py bdist_wheel; \
             pip install ${UNSLOTH_DOCKER_DIR_PATH}/dist/*.whl; \
         "

@@ -56,7 +56,7 @@ download_dataset() {
         echo "$dataset_name dataset already exists, skipping download."
     else
         echo "Downloading $dataset_name dataset..."
-        huggingface-cli download "$repo_name" --repo-type dataset --local-dir "$dataset_path"
+        hf download "$repo_name" --repo-type dataset --local-dir "$dataset_path"
         echo "$dataset_name dataset downloaded successfully."
     fi
     
