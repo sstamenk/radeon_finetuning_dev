@@ -1,5 +1,5 @@
 # Unsloth Dev Tools
-
+A collection of tools to simplify building and developing Unsloth and other fine-tuning libraries. Includes utilities for downloading required datasets, running a Docker container with all prerequisites pre-installed, and a suite of testing scripts for Unsloth.
 ## Directory Layout
 ```
 unsloth_dev/
